@@ -1,0 +1,22 @@
+<div class="modal" id="apply-modal" hidden>
+  <form class="sheet" id="apply-form" role="dialog" aria-modal="true" aria-labelledby="a-title">
+    <button type="button" class="icon-btn close" data-close aria-label="Fermer">✕</button>
+    <h2 id="a-title">Envoyer mon CV</h2>
+    <p class="muted" id="a-target"></p>
+    <label>Email du recruteur
+      <span class="inline"><input type="email" id="a-to" required placeholder="recrutement@entreprise.ma">
+      <button type="button" class="btn ghost sm" id="a-find">Chercher</button></span>
+      <small id="a-found" class="muted"></small>
+    </label>
+    <label>Objet<input id="a-subject" required maxlength="200"></label>
+    <label>Message<textarea id="a-body" rows="9" required maxlength="5000"></textarea></label>
+    <p class="muted attach">📎 Pièce jointe : votre CV en PDF (<a href="{{ url_for('studio_cv') }}">modifier mon CV</a>)</p>
+    <p id="a-msg" class="msg" role="status"></p>
+    <div class="actions">
+      <button class="btn primary" id="a-send">Envoyer</button>
+      <a class="btn ghost" href="{{ url_for('cv_pdf') }}">Télécharger le CV</a>
+      <a class="btn ghost" id="a-mailto" href="#" hidden>Ouvrir ma messagerie</a>
+      <button type="button" class="btn ghost" id="a-mark">Déjà postulé ailleurs ? Marquer « Envoyé »</button>
+    </div>
+  </form>
+</div>

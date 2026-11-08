@@ -1,0 +1,62 @@
+
+{% extends "base.html" %}
+{% block title %}Paramètres · Khedma Marrakech{% endblock %}
+{% block content %}
+<h1>Paramètres et clés API</h1>
+<p class="muted">Vos clés sont chiffrées sur le serveur et ne sont jamais réaffichées en clair. Laissez un champ vide pour conserver la valeur actuelle.</p>
+
+<form method="post" class="form" autocomplete="off">
+  {% for group, names, hint in [
+    ('Google Places', ['GOOGLE_MAPS_API_KEY'], 'Recherche de nouvelles entreprises. Créez la clé dans Google Cloud (API « Places API (New) »).'),
+    ('Envoi de CV par email (SMTP)', ['SMTP_HOST','SMTP_PORT','SMTP_USER','SMTP_PASSWORD','SMTP_FROM'], 'Pour envoyer votre CV depuis votre propre boîte mail. Gmail : serveur smtp.gmail.com, port 587, mot de passe d\'application.')
+  ] %}
+  <fieldset class="panel keys">
+    <legend>{{ group }}</legend>
+    <p class="muted">{{ hint }}</p>
+
+    {% for r in rows if r.name in names %}
+    <label>{{ r.label }}
+      <span class="inline">
+        <input name="{{ r.name }}" {{ 'type=password' if r.secret else '' }} value="{{ r.value }}" autocomplete="off"
+               placeholder="{{ r.masked if r.masked else ('Fournie par le serveur' if r.source == 'server' else 'Non définie') }}">
+        {% if r.source == 'user' %}
+        <label class="check">
+          <input type="checkbox" name="del_{{ r.name }}">Supprimer
+        </label>
+        {% endif %}
+      </span>
+      <small class="muted">
+        {% if r.source == 'user' %}
+          Enregistrée dans votre compte
+        {% elif r.source == 'server' %}
+          Valeur par défaut du serveur
+        {% else %}
+          Non définie
+        {% endif %}
+      </small>
+    </label>
+    {% endfor %}
+
+    {% if group == 'Google Places' %}
+    <div class="actions">
+      <button type="button" class="btn ghost sm js-test" data-what="google">Tester la clé</button>
+      <span class="msg" data-for="google"></span>
+    </div>
+    {% endif %}
+
+    {% if group.startswith('Envoi') %}
+    <div class="actions">
+      <button type="button" class="btn ghost sm js-test" data-what="smtp">Tester la connexion</button>
+      <span class="msg" data-for="smtp"></span>
+    </div>
+    {% endif %}
+  </fieldset>
+  {% endfor %}
+
+  <button class="btn primary">Enregistrer</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='search.js') }}"></script>
+{% endblock %}

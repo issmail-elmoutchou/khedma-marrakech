@@ -1,0 +1,11 @@
+.env
+*.db
+*.sqlite*
+data/
+__pycache__/
+*.pyc
+.git
+.venv
+venv
+node_modules
+*.ipynb

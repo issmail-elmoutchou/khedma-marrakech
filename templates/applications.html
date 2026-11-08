@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Candidatures · Khedma Marrakech{% endblock %}
+{% block content %}
+<div class="sec-head"><h1>Suivi des candidatures <small class="muted">{{ total }} au total</small></h1></div>
+<form class="filters" id="add-app">
+  <input name="poste" placeholder="Poste (candidature faite hors de l'application)" required maxlength="200">
+  <input name="entreprise" placeholder="Entreprise" maxlength="200">
+  <button class="btn primary">Ajouter</button>
+</form>
+<p class="muted hint">Glissez une carte dans une autre colonne pour changer son statut. Sur mobile, utilisez la liste déroulante de la carte.</p>
+<div class="board" id="board">
+  {% for s, rows in cols.items() %}
+  <section class="col col-{{ loop.index0 }}" data-status="{{ s }}" aria-label="{{ s }}">
+    <h2>{{ s }} <span class="count">{{ rows|length }}</span></h2>
+    <div class="drop">
+      {% for r in rows %}
+      <article class="card mini" draggable="true" data-url="{{ r.url }}" data-poste="{{ r.poste }}" data-entreprise="{{ r.entreprise }}">
+        <button class="icon-btn del" aria-label="Supprimer" title="Supprimer">✕</button>
+        {% if r.url.startswith('http') %}<a href="{{ r.url }}" target="_blank" rel="noopener"><strong>{{ r.poste }}</strong></a>{% else %}<strong>{{ r.poste }}</strong>{% endif %}
+        {% if r.entreprise %}<span class="muted">{{ r.entreprise }}</span>{% endif %}
+        <small class="muted">Mis à jour le {{ r.date_maj }}</small>
+        <textarea class="js-notes" rows="2" placeholder="Notes" aria-label="Notes">{{ r.notes }}</textarea>
+        <select class="status js-status" aria-label="Statut">{% for x in statuts %}<option {{ 'selected' if x == s }}>{{ x }}</option>{% endfor %}</select>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% if total == 0 %}<p class="empty">Aucune candidature pour l'instant. Utilisez « Postuler avec mon CV » sur une offre, ou ajoutez-en une ci-dessus.</p>{% endif %}
+{% endblock %}

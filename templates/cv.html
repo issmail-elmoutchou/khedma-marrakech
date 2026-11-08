@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Studio CV · Khedma Marrakech{% endblock %}
+{% block content %}
+<div class="sec-head"><h1>Studio CV</h1>
+  <div class="actions" style="margin:0;padding:0">
+    <button class="btn primary" id="cv-save">Enregistrer</button>
+    <a class="btn ghost" href="{{ url_for('cv_pdf') }}" id="cv-pdf">Télécharger en PDF</a>
+  </div>
+</div>
+<p class="msg" id="cv-msg" role="status"></p>
+<div class="cv-layout">
+  <form class="cv-form" id="cv-editor" autocomplete="off" onsubmit="return false">
+    <fieldset><legend>Modèle</legend>
+      <div class="seg" role="radiogroup" aria-label="Modèle de CV">
+        <label class="seg-opt"><input type="radio" name="cv-style" value="modern"> Moderne (2 colonnes)</label>
+        <label class="seg-opt"><input type="radio" name="cv-style" value="classic"> Classique</label>
+      </div>
+    </fieldset>
+    <fieldset><legend>Identité</legend>
+      <label>Nom complet<input data-f="full_name"></label>
+      <label>Titre professionnel<input data-f="title" placeholder="ex. Assistant Data Analyst"></label>
+      <div class="two"><label>Email<input data-f="email" type="email"></label><label>Téléphone<input data-f="phone"></label></div>
+      <div class="two"><label>Ville<input data-f="city"></label><label>Liens (LinkedIn, GitHub)<input data-f="links"></label></div>
+    </fieldset>
+    <fieldset><legend>Profil</legend>
+      <label>Résumé en 2-3 phrases<textarea data-f="summary" rows="4"></textarea></label>
+    </fieldset>
+    <fieldset><legend>Formation</legend><div id="edu-list"></div><button type="button" class="btn soft sm" id="edu-add">+ Ajouter une formation</button></fieldset>
+    <fieldset><legend>Expériences / stages</legend><div id="exp-list"></div><button type="button" class="btn soft sm" id="exp-add">+ Ajouter une expérience</button></fieldset>
+    <fieldset><legend>Projets</legend><div id="prj-list"></div><button type="button" class="btn soft sm" id="prj-add">+ Ajouter un projet</button></fieldset>
+    <fieldset><legend>Compétences et langues</legend>
+      <label>Compétences
+        <textarea data-f="skills" rows="6" placeholder="Python, SQL, Pandas&#10;ou en groupes :&#10;Techniques:&#10;- Python&#10;- SQL&#10;Personnelles:&#10;- Esprit d'analyse"></textarea>
+        <small class="muted">Séparez par des virgules, ou une compétence par ligne avec « - ». Pour des groupes, écrivez le titre suivi de « : » (ou collez du texte avec « ### Titre »).</small>
+      </label>
+      <label>Langues
+        <textarea data-f="languages" rows="3" placeholder="Arabe : langue maternelle&#10;Français : courant&#10;Anglais : intermédiaire"></textarea>
+      </label>
+    </fieldset>
+  </form>
+  <aside class="cv-preview-wrap"><div class="cvp modern" id="cv-preview" aria-label="Aperçu du CV"></div></aside>
+</div>
+<script id="cv-data" type="application/json">{{ cv|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='cv.js') }}"></script>{% endblock %}

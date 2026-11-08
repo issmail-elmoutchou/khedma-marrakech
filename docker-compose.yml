@@ -1,0 +1,29 @@
+services:
+  web:
+    build: .
+    image: khedma-marrakech
+    ports:
+      - "8000:8000"
+    env_file: .env            # copiez .env.example vers .env puis remplissez-le
+    environment:
+      DB_PATH: /app/storage/career.db
+      N8N_ALLOW_PRIVATE: "1"   # n8n est dans le même réseau Docker (adresse privée) : autorisé ici
+    volumes:
+      - khedma_db:/app/storage   # la base (comptes, CV, candidatures) survit aux redémarrages
+    restart: unless-stopped
+
+  n8n:                          # facultatif : automatisation (notifications Telegram, rapports...)
+    image: docker.n8n.io/n8nio/n8n
+    ports:
+      - "5678:5678"
+    environment:
+      GENERIC_TIMEZONE: Africa/Casablanca
+      TZ: Africa/Casablanca
+      N8N_SECURE_COOKIE: "false"   # accès en http local ; mettre true derrière HTTPS
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+volumes:
+  khedma_db:
+  n8n_data:

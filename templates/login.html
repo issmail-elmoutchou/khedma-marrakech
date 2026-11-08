@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Connexion' if mode == 'login' else 'Créer un compte' }} · Khedma Marrakech{% endblock %}
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-side">
+    <span class="logo big has-img"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="Khedma Marrakech"></span>
+    <h1>Trouvez votre prochain poste à Marrakech.</h1>
+    <p>Offres Rekrute, entreprises locales et suivi de vos candidatures, au même endroit.</p>
+  </div>
+  <form class="auth-form" method="post">
+    <h2>{{ 'Se connecter' if mode == 'login' else 'Créer un compte' }}</h2>
+    {% if mode == 'register' %}<label>Nom complet<input name="name" required autocomplete="name"></label>{% endif %}
+    <label>Email<input type="email" name="email" required autocomplete="email"></label>
+    
+    <label>
+      Mot de passe
+      <input type="password" name="password" required minlength="{{ 8 if mode == 'register' else 1 }}" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}">
+    </label>
+
+    {% if mode == 'login' %}
+      <p style="margin-top: -8px; margin-bottom: 15px; text-align: right;">
+        <a href="{{ url_for('forgot_password') }}" class="muted" style="font-size: 0.9em;">Mot de passe oublié ?</a>
+      </p>
+    {% endif %}
+
+    <button class="btn primary">{{ 'Se connecter' if mode == 'login' else 'Créer mon compte' }}</button>
+    <p class="muted">{% if mode == 'login' %}Pas encore de compte ? <a href="{{ url_for('register') }}">Créer un compte</a>{% else %}Déjà inscrit ? <a href="{{ url_for('login') }}">Se connecter</a>{% endif %}</p>
+  </form>
+</section>
+{% endblock %}

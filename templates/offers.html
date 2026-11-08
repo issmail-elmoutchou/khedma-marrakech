@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_macros.html" import offer_card, pager %}
+{% block title %}Offres · Khedma Marrakech{% endblock %}
+{% block content %}
+<div class="sec-head"><h1>Offres d'emploi <small class="muted">{{ total }} résultat(s)</small></h1></div>
+{% if not has_profile %}<div class="callout">Complétez votre profil pour trier les offres par correspondance. <a class="btn primary sm" href="{{ url_for('profile') }}">Mon profil</a></div>{% endif %}
+<form class="filters" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Métier ou entreprise" aria-label="Rechercher">
+  <select name="secteur" aria-label="Secteur" onchange="this.form.submit()">
+    <option value="">Tous les secteurs</option>
+    {% for s in all_sectors %}<option {{ 'selected' if s == sector }}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="tri" aria-label="Trier" onchange="this.form.submit()">
+    <option value="match" {{ 'selected' if sort == 'match' }}>Meilleure correspondance</option>
+    <option value="titre" {{ 'selected' if sort == 'titre' }}>Titre (A-Z)</option>
+  </select>
+  <button class="btn primary">Filtrer</button>
+</form>
+<p><a class="btn soft sm" href="{{ url_for('search_page', type='offers') }}">Chercher de nouvelles offres</a></p>
+{% if items %}
+<div class="grid">{% for o in items %}{{ offer_card(o, favs, st) }}{% endfor %}</div>
+{{ pager(page, pages) }}
+{% else %}<p class="empty">Aucune offre ne correspond. Essayez un autre mot-clé ou retirez le filtre de secteur.</p>{% endif %}
+{% endblock %}
