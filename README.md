@@ -1,4 +1,4 @@
-# Marrakech Career
+# khedma marrakech
 
 Application web Flask (remplace l'interface Streamlit) : connexion, tableau de bord,
 offres en cartes, recommandations selon le profil, résumé d'offres, carte, candidatures et favoris.
