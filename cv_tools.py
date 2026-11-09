@@ -311,21 +311,54 @@ def send_application(to: str, subject: str, body: str, sender_name: str, reply_t
     with _connect(cfg) as s:
         s.send_message(msg)
 
-
 def find_emails(url: str) -> list:
-    """Cherche des adresses email publiques sur une page (page de l'offre ou site de l'entreprise)."""
+    """Cherche des adresses email publiques sur un site web."""
+
     found = []
-    for u in [url, url.rstrip("/") + "/contact"]:
+
+    if not url:
+        return []
+
+    urls = [
+        url,
+        url.rstrip("/") + "/contact"
+    ]
+
+    for u in urls:
         try:
-            r = requests.get(u, headers={"User-Agent": "Mozilla/5.0"}, timeout=12)
+            r = requests.get(
+                u,
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=20
+            )
+
             if r.ok:
                 found += EMAIL_RE.findall(r.text)
-        except Exception:
-            continue
-    bad = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", "sentry", "example.", "wixpress", "@2x")
+            else:
+                app.logger.warning(
+                    "Email search HTTP %s: %s",
+                    r.status_code,
+                    u
+                )
+
+        except requests.exceptions.RequestException:
+            app.logger.exception(
+                "Email search connection error: %s",
+                u
+            )
+
+    bad = (
+        ".png", ".jpg", ".jpeg", ".gif",
+        ".webp", ".svg", "sentry",
+        "example.", "wixpress", "@2x"
+    )
+
     out = []
+
     for e in found:
         e = e.lower()
+
         if not any(b in e for b in bad) and e not in out:
             out.append(e)
+
     return out[:5]
