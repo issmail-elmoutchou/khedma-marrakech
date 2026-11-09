@@ -16,6 +16,10 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import HRFlowable, KeepInFrame, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 EMPTY_CV = {"full_name": "", "title": "", "email": "", "phone": "", "city": "Marrakech", "links": "",
             "summary": "", "experiences": [], "education": [], "projects": [], "skills": "", "languages": "",
@@ -335,14 +339,14 @@ def find_emails(url: str) -> list:
             if r.ok:
                 found += EMAIL_RE.findall(r.text)
             else:
-                app.logger.warning(
+                logger.warning(
                     "Email search HTTP %s: %s",
                     r.status_code,
                     u
                 )
 
         except requests.exceptions.RequestException:
-            app.logger.exception(
+            logger.exception(
                 "Email search connection error: %s",
                 u
             )
