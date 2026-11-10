@@ -41,20 +41,7 @@ Toutes les couleurs sont en haut de `static/style.css` (variables `--wine`, `--s
 - **Graphiques** : la page Statistiques et le tableau de bord se mettent à jour toutes les 30 s sans recharger la page.
 - Les offres et entreprises ajoutées sont partagées entre tous les utilisateurs de l'instance.
 
-## Automatisation avec n8n
-Deux sens, au choix :
-1. **L'application prévient n8n** : quand une recherche enregistrée trouve de nouvelles offres au-dessus de votre seuil, elle envoie un webhook (Paramètres > Automatisation n8n).
-2. **n8n interroge l'application** avec un jeton API (créé dans Paramètres, affiché une seule fois) :
-   - `GET /api/n8n/offers?min_match=50&since_hours=24` : offres et % de correspondance
-   - `GET /api/n8n/summary` : résumé pour un rapport quotidien
-   - `POST /api/n8n/refresh` : relance vos recherches enregistrées
-   (en-tête `Authorization: Bearer <jeton>`)
 
-Mise en route avec Docker : `docker compose up -d --build`, puis ouvrir n8n sur http://localhost:5678, importer les 3 fichiers de `n8n/`
-(Workflows > Import from file), choisir vos identifiants Telegram, remplacer `REMPLACER_PAR_VOTRE_CHAT_ID` et `COLLEZ_VOTRE_JETON_ICI`,
-activer les workflows, puis coller l'URL **production** du webhook (`http://n8n:5678/webhook/khedma-offres`) dans Paramètres.
-Hors Docker, remplacez `http://web:8000` par `http://host.docker.internal:5000` et définissez `N8N_ALLOW_PRIVATE=1`.
-Note : ces workflows n'ont pas pu être testés dans n8n lui-même ; si l'import signale un nœud, recréez-le à la main avec les mêmes réglages.
 
 ## Sécurité et tests
 - **CSRF** : toutes les requêtes POST exigent un jeton lié à la session. `static/csrf.js` l'ajoute automatiquement aux formulaires et aux `fetch()`.
