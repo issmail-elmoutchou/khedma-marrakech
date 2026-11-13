@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_macros.html" import company_card, offer_card %}
+{% block title %}Tableau de bord · Khedma Marrakech{% endblock %}
+{% block content %}
+<h1>Bonjour {{ user['name'].split()[0] }}</h1>
+{% if profile_empty %}
+<div class="callout">Ajoutez votre métier et vos compétences pour voir les offres qui vous correspondent. <a class="btn primary sm" href="{{ url_for('profile') }}">Compléter mon profil</a></div>
+{% endif %}
+<section class="kpis">
+  <div class="kpi"><b data-k="offers">{{ n_offers }}</b>offres</div>
+  <div class="kpi"><b data-k="companies">{{ n_companies }}</b>entreprises</div>
+  <div class="kpi"><b data-k="sectors">{{ n_sectors }}</b>secteurs</div>
+  <div class="kpi"><b data-k="applications">{{ n_apps }}</b>candidatures</div>
+</section>
+
+<section class="panel">
+  <h2>Offres par secteur</h2>
+  <ul class="bars" id="live-bars">
+    {% for c in chart %}
+    <li><span class="lbl">{{ c.label }}</span><span class="track"><span class="fill" style="width: {{ (c.n / max_n * 100)|round(1) }}%"></span></span><span class="num">{{ c.n }}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Offres pour votre profil</h2><a href="{{ url_for('offers') }}">Voir tout →</a></div>
+  <div class="grid">{% for o in top_offers %}{{ offer_card(o, ofavs, st) }}{% endfor %}</div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Entreprises recommandées</h2><a href="{{ url_for('companies') }}">Voir tout →</a></div>
+  <div class="grid four">{% for c in companies %}{{ company_card(c, favs) }}{% endfor %}</div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='live.js') }}"></script>{% endblock %}

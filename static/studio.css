@@ -1,0 +1,67 @@
+/* Studio CV, Kanban et fenêtre d'envoi : utilise les variables de style.css */
+.inline{display:flex;gap:8px}.inline input{flex:1}
+.msg{min-height:1.4em;font-weight:700;font-size:.9rem;margin:6px 0}.msg.ok{color:var(--ok)}.msg.error{color:var(--err)}
+.attach{font-size:.85rem}
+#apply-form{display:grid;gap:12px}#apply-form label{display:grid;gap:5px;font-weight:700;font-size:.85rem}
+#apply-form textarea{font-weight:500}
+.hint{font-size:.85rem;margin:-4px 0 14px}
+
+.board{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:12px;align-items:start;overflow-x:auto;padding-bottom:12px}
+.col{background:var(--wine-soft);border-radius:var(--r);padding:10px;min-height:220px;border-top:4px solid var(--wine-2)}
+.col h2{font-size:.92rem;margin:2px 4px 10px}
+.col-1{border-top-color:var(--saffron)}.col-2{border-top-color:#6C8EE0}
+.col-3{border-top-color:var(--err)}.col-4{border-top-color:var(--ok)}
+.drop{display:grid;gap:10px;min-height:160px;border-radius:10px;align-content:start}
+.col.over{outline:2px dashed var(--saffron);outline-offset:-4px}
+.card.mini{position:relative;gap:6px;padding:12px;font-size:.86rem;cursor:grab}
+.card.mini:active{cursor:grabbing}.card.mini.dragging{opacity:.4}
+.card.mini a{color:var(--ink);text-decoration:none}
+.card.mini .del{position:absolute;top:4px;right:4px;font-size:.75rem;color:var(--muted)}
+.card.mini strong{padding-right:18px}
+.card.mini textarea{font-size:.8rem;resize:vertical}
+@media(max-width:860px){.board{grid-template-columns:repeat(5,250px)}}
+
+.cv-layout{display:grid;grid-template-columns:minmax(320px,1fr) minmax(340px,1fr);gap:20px;align-items:start}
+@media(max-width:1100px){.cv-layout{grid-template-columns:1fr}}
+.cv-form{display:grid;gap:14px}.cv-form fieldset{background:var(--card);display:grid;gap:10px}
+.cv-form label{display:grid;gap:4px;font-weight:700;font-size:.82rem}.cv-form input,.cv-form textarea{font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rep{border:1px dashed var(--line);border-radius:10px;padding:10px;display:grid;gap:8px;margin-bottom:10px;position:relative}
+.rep .rm{position:absolute;top:2px;right:4px;font-size:.8rem;color:var(--muted)}
+.cv-preview-wrap{position:sticky;top:16px}
+.cv-paper{background:#fff;color:#222;border:1px solid var(--line);border-radius:6px;padding:28px 30px;min-height:520px;font-size:.78rem;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+.cv-paper h3{margin:0;font-size:1.5rem;color:var(--wine)}.cv-paper .t{font-size:.95rem;color:#444}.cv-paper .m{color:#666;font-size:.72rem}
+.cv-paper h4{margin:14px 0 4px;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--wine);border-bottom:1.5px solid var(--wine);padding-bottom:2px}
+.cv-paper .it{margin-top:6px}.cv-paper .it small{color:#777}.cv-paper ul{margin:2px 0 0;padding-left:16px}
+
+/* Statistiques */
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.charts .wide{grid-column:1/-1}.charts .panel{margin:0}
+.cbox{position:relative;height:300px;margin-top:12px}.cbox.short{height:220px}
+
+/* Recherche, paramètres, actualisation */
+.seg{display:inline-flex;background:var(--wine-soft);border-radius:12px;padding:4px;margin-bottom:16px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;font:inherit;font-weight:700;font-size:.88rem;padding:8px 16px;border-radius:9px;cursor:pointer;color:var(--ink)}
+.seg button.on{background:var(--wine);color:#fff}
+.card.result{flex-direction:row;gap:10px;align-items:flex-start;cursor:pointer}
+.card.result input{margin-top:4px;flex:none}
+.card.result .rt{display:grid;gap:3px;min-width:0}.card.result strong{line-height:1.3}
+.card.result a{font-size:.8rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:10px}
+.tbl th{text-align:left;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl .q{font-weight:700;word-break:break-word}
+.keys{display:grid;gap:12px}.keys label{display:grid;gap:5px;font-weight:700;font-size:.85rem}.keys .inline{align-items:center}
+.keys legend{font-size:1rem;font-weight:800}
+.live-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-4px 0 14px;font-size:.84rem}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);display:inline-block}.dot.off{background:var(--muted)}
+.flash-up{animation:flash 1.2s ease-out}@keyframes flash{from{background:var(--saffron-soft)}to{background:transparent}}
+
+/* Jeton API, logo image, liens en mode sombre */
+.sep{border:0;border-top:1px solid var(--line);margin:8px 0;width:100%}
+.token-box{background:var(--saffron-soft);border-radius:10px;padding:12px;word-break:break-all;font-size:.85rem}
+.token-box code{font-weight:800}
+.logo img{display:block;width:100%;height:100%;object-fit:contain}
+.logo.has-img{background:#fff;padding:5px}
+.logo.big.has-img{width:84px;height:84px;padding:8px;border-radius:18px}
+@media (prefers-color-scheme: dark){ a{color:var(--saffron)} }

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "_macros.html" import company_card, offer_card %}
+{% block title %}Favoris · Khedma Marrakech{% endblock %}
+{% block content %}
+<h1>Favoris</h1>
+{% if not offers and not companies %}<p class="empty">Rien ici pour l'instant. Touchez le cœur d'une offre ou d'une entreprise pour la retrouver ici.</p>{% endif %}
+{% if offers %}<h2>Offres</h2><div class="grid">{% for o in offers %}{{ offer_card(o, ofavs, st) }}{% endfor %}</div>{% endif %}
+{% if companies %}<h2>Entreprises</h2><div class="grid four">{% for c in companies %}{{ company_card(c, favs) }}{% endfor %}</div>{% endif %}
+{% endblock %}

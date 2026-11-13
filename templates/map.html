@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Carte ·Khedma Marrakech{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+
+<style>
+  #map, .map {
+    height: 600px;
+    width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+  }
+  
+  .custom-popup .leaflet-popup-content-wrapper {
+    border-radius: 10px;
+  }
+  .popup-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1e293b;
+  }
+  .popup-badge {
+    display: inline-block;
+    background: #e0e7ff;
+    color: #3730a3;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 4px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Carte des entreprises</h1>
+</div>
+
+{% if has_points %}
+<div id="map" class="map"></div>
+{% else %}
+<p class="empty">Aucune entreprise géolocalisée pour le moment.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if has_points %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let rawData = {{ points | safe }};
+    let pts = [];
+
+    try {
+        pts = typeof rawData === "string" ? JSON.parse(rawData) : rawData;
+    } catch (e) {
+        console.error("Erreur lors du parse des données :", e);
+    }
+
+    // 1. طبقات خرائط مجانية 100% وبدون مفتاح API
+    const osmStandard = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    });
+
+    const osmFrance = L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap France',
+        maxZoom: 20
+    });
+
+    const esriWorldTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles © Esri'
+    });
+
+    const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles © Esri'
+    });
+
+    // إنشاء الخريطة
+    const map = L.map('map', {
+        center: [31.63, -8.0],
+        zoom: 13,
+        layers: [osmFrance]
+    });
+
+    // زر التحكم والتنقل بين الخرائط المجانية
+    const baseMaps = {
+        "🗺️ Carte Détaillée (OSM FR)": osmFrance,
+        "⛰️ Carte Relief / Topo (Esri)": esriWorldTopo,
+        "🛰️ Satellite (Esri Imagery)": esriSatellite,
+        "📍 Standard (OSM)": osmStandard
+    };
+    L.control.layers(baseMaps).addTo(map);
+
+    const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    // تجميع العلامات (MarkerCluster)
+    const markers = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 40
+    });
+
+    const bounds = [];
+
+    if (Array.isArray(pts)) {
+        pts.forEach(p => {
+            const lat = parseFloat(p.latitude);
+            const lng = parseFloat(p.longitude);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                bounds.push([lat, lng]);
+
+                let popupContent = `
+                    <div class="custom-popup">
+                        <div class="popup-title">${esc(p.nom)}</div>
+                        <span class="popup-badge">${esc(p.categorie || 'Entreprise')}</span>
+                        ${p.note ? `<br><small>⭐ ${p.note}/5</small>` : ''}
+                        <br><small>📍 ${esc(p.adresse)}</small>
+                        ${p.site_web ? `<br><a href="${esc(p.site_web)}" target="_blank" style="color:#2563eb;font-weight:500;">Visiter le site web ↗</a>` : ''}
+                    </div>
+                `;
+
+                const marker = L.marker([lat, lng])
+                    .bindPopup(popupContent)
+                    .bindTooltip(esc(p.nom));
+
+                markers.addLayer(marker);
+            }
+        });
+    }
+
+    map.addLayer(markers);
+
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [30, 30] });
+    }
+
+    setTimeout(() => { map.invalidateSize(); }, 200);
+});
+</script>
+{% endif %}
+{% endblock %}

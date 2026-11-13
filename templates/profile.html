@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Profil · Khedma Marrakech{% endblock %}
+{% block content %}
+<h1>Mon profil</h1>
+<p class="muted">Ces informations servent uniquement à calculer le pourcentage de correspondance des offres.</p>
+<form class="panel form" method="post">
+  <label>Nom<input name="name" value="{{ user['name'] }}" required></label>
+  <label>Poste recherché<input name="title" value="{{ user['title'] }}" placeholder="ex. Data Analyst"></label>
+  <label>Compétences<input name="skills" value="{{ user['skills'] }}" placeholder="ex. Python, SQL, Power BI, gestion de projet"></label>
+  <label>À propos de vous<textarea name="bio" rows="4" placeholder="Votre parcours en quelques lignes">{{ user['bio'] }}</textarea></label>
+  <fieldset><legend>Secteurs qui vous intéressent</legend>
+    <div class="checks">{% for s in all_sectors if s != 'Non classé' %}<label class="check"><input type="checkbox" name="sectors" value="{{ s }}" {{ 'checked' if s in chosen }}>{{ s }}</label>{% endfor %}</div>
+  </fieldset>
+  <button class="btn primary">Enregistrer</button>
+</form>
+{% endblock %}

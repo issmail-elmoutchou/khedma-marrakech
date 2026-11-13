@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Statistiques · Khedma Marrakech{% endblock %}
+{% block content %}
+<h1>Statistiques</h1>
+<div class="live-bar"><span class="dot" id="live-dot"></span><span id="live-status" class="muted">Chargement…</span>
+  <button class="btn ghost sm" id="live-now" type="button">Actualiser</button>
+  <button class="btn ghost sm" id="live-toggle" type="button">Mettre en pause</button></div>
+<section class="kpis" id="kpis"></section>
+<div class="charts">
+  <section class="panel wide"><h2>Offres par secteur</h2><div class="cbox"><canvas id="c-offers"></canvas></div></section>
+  <section class="panel"><h2>Entreprises par secteur</h2><div class="cbox"><canvas id="c-comp"></canvas></div></section>
+  <section class="panel"><h2>Mots les plus demandés dans les offres</h2><div class="cbox"><canvas id="c-words"></canvas></div></section>
+  <section class="panel"><h2>Notes Google des entreprises</h2><div class="cbox"><canvas id="c-rating"></canvas></div></section>
+  <section class="panel"><h2>Correspondance avec votre profil</h2><div class="cbox"><canvas id="c-match"></canvas></div></section>
+  <section class="panel"><h2>Mieux notées</h2><div class="cbox"><canvas id="c-top"></canvas></div></section>
+  <section class="panel"><h2>Vos candidatures par statut</h2><div class="cbox"><canvas id="c-funnel"></canvas></div></section>
+  <section class="panel wide"><h2>Activité de candidature</h2><div class="cbox short"><canvas id="c-time"></canvas></div></section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='stats.js') }}"></script>
+{% endblock %}

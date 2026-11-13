@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Recherche · Khedma Marrakech{% endblock %}
+{% block content %}
+<h1>Rechercher de nouvelles données</h1>
+<div class="seg" role="tablist">
+  <button type="button" role="tab" data-kind="offers" class="{{ 'on' if kind != 'companies' }}">Offres d'emploi (Rekrute)</button>
+  <button type="button" role="tab" data-kind="companies" class="{{ 'on' if kind == 'companies' }}">Entreprises (Google Places)</button>
+</div>
+{% if not has_google %}
+<div class="callout" id="google-warn" {{ 'hidden' if kind != 'companies' }}>La recherche d'entreprises demande une clé API Google Places. <a class="btn primary sm" href="{{ url_for('settings_page') }}">Ajouter ma clé</a></div>
+{% endif %}
+<form class="filters" id="search-form">
+  <input type="search" id="s-query" required minlength="2" maxlength="300" aria-label="Recherche">
+  <button class="btn primary" id="s-go">Rechercher</button>
+  <button class="btn ghost" type="button" id="s-save" title="Relancée automatiquement toutes les {{ interval }} h">Enregistrer cette recherche</button>
+</form>
+<p class="msg" id="s-msg" role="status"></p>
+
+<section id="results" hidden>
+  <div class="sec-head">
+    <h2 id="r-title"></h2>
+    <div class="actions" style="margin:0;padding:0">
+      <label class="check"><input type="checkbox" id="r-all" checked> Tout sélectionner</label>
+      <button class="btn primary sm" id="r-add">Ajouter la sélection</button>
+    </div>
+  </div>
+  <div class="grid" id="r-list"></div>
+</section>
+
+<section class="panel" style="margin-top:28px">
+  <h2>Recherches enregistrées</h2>
+  <p class="muted">Elles sont relancées automatiquement toutes les {{ interval }} h ; les nouveautés sont ajoutées et les graphiques se mettent à jour.</p>
+  {% if saved %}
+  <table class="tbl">
+    <thead><tr><th>Type</th><th>Recherche</th><th>Dernière exécution</th><th>Auto</th><th></th></tr></thead>
+    <tbody>
+    {% for s in saved %}
+    <tr data-id="{{ s.id }}">
+      <td>{{ 'Offres' if s.kind == 'offers' else 'Entreprises' }}</td>
+      <td class="q">{{ s.query }}</td>
+      <td class="muted">{% if s.last_run %}{{ s.last_run }} · {% if s.last_status == 'OK' %}{{ s.last_added }} ajouté(s){% else %}{{ s.last_status }}{% endif %}{% else %}pas encore exécutée{% endif %}</td>
+      <td><label class="check"><input type="checkbox" class="js-toggle" {{ 'checked' if s.auto }}></label></td>
+      <td class="actions" style="margin:0;padding:0"><button class="btn soft sm js-run">Lancer</button><button class="btn ghost sm js-del">Supprimer</button></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="empty">Aucune recherche enregistrée. Lancez une recherche puis choisissez « Enregistrer cette recherche ».</p>{% endif %}
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='search.js') }}"></script>{% endblock %}
