@@ -312,20 +312,82 @@ def send_application(to: str, subject: str, body: str, sender_name: str, reply_t
         s.send_message(msg)
 
 
+
 def find_emails(url: str) -> list:
-    """Cherche des adresses email publiques sur une page (page de l'offre ou site de l'entreprise)."""
+    """Cherche les emails publics sur le site d'une entreprise."""
+
+    from urllib.parse import urljoin, urlparse
+    from bs4 import BeautifulSoup
+    import html
+
+    if not url:
+        return []
+
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+    }
+
     found = []
-    for u in [url, url.rstrip("/") + "/contact"]:
+    pages = [url]
+
+    def extract_emails(content):
+        content = html.unescape(content or "")
+        found.extend(EMAIL_RE.findall(content))
+
+        soup = BeautifulSoup(content, "html.parser")
+
+        for link in soup.find_all("a", href=True):
+            href = link["href"].strip()
+
+            if href.lower().startswith("mailto:"):
+                email = href[7:].split("?")[0].strip()
+                found.append(email)
+
+            elif any(word in href.lower() for word in
+                     ["contact", "about", "nous-contacter", "contactez"]):
+                page = urljoin(url, href)
+
+                if urlparse(page).netloc == urlparse(url).netloc:
+                    pages.append(page)
+
+    try:
+        response = requests.get(url, headers=headers, timeout=20)
+        if response.ok:
+            extract_emails(response.text)
+    except requests.RequestException:
+        pass
+
+    for path in ["/contact", "/contact-us", "/about", "/nous-contacter"]:
+        pages.append(urljoin(url, path))
+
+    pages = list(dict.fromkeys(pages))
+
+    for page in pages[1:]:
         try:
-            r = requests.get(u, headers={"User-Agent": "Mozilla/5.0"}, timeout=12)
-            if r.ok:
-                found += EMAIL_RE.findall(r.text)
-        except Exception:
+            response = requests.get(page, headers=headers, timeout=15)
+            if response.ok:
+                extract_emails(response.text)
+        except requests.RequestException:
             continue
-    bad = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", "sentry", "example.", "wixpress", "@2x")
+
+    bad = (
+        ".png", ".jpg", ".jpeg", ".gif", ".webp",
+        ".svg", "sentry", "example.", "wixpress", "@2x"
+    )
+
     out = []
-    for e in found:
-        e = e.lower()
-        if not any(b in e for b in bad) and e not in out:
-            out.append(e)
+
+    for email in found:
+        email = email.lower().strip()
+
+        if (
+            EMAIL_RE.fullmatch(email)
+            and not any(word in email for word in bad)
+            and email not in out
+        ):
+            out.append(email)
+
     return out[:5]
