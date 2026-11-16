@@ -107,46 +107,75 @@ SECTOR_NAMES = [name for name, _ in SECTORS] + ["Non classé"]
 
 
 
+# Mots-clés génériques (poids faible) : ils servent quand aucun mot-clé précis n'est trouvé.
+EXTRA_KEYWORDS = {
+    "Informatique & IA": ["developpeuse", "data", "ingenieur logiciel", "technicien informatique"],
+    "Santé": ["aide soignant", "kinesitherapeute", "dentiste", "soins"],
+    "Marketing & Communication": ["graphiste", "designer", "charge de communication", "contenu"],
+    "Immobilier & Construction": ["travaux", "batiment", "conducteur de travaux", "ingenieur travaux", "bureau d etudes"],
+    "Éducation & Formation": ["enseignant", "professeur", "pedagogique", "cours"],
+    "Industrie & Logistique": ["technicien", "maintenance", "mecanicien", "operateur", "ouvrier", "elevage",
+                               "agroalimentaire", "chauffeur", "magasinier"],
+    "Finance & Assurance": ["gestionnaire de paie", "controleur de gestion", "tresorerie", "facturation"],
+    "Hôtellerie & Tourisme": ["serveur", "cuisinier", "receptionniste", "reception", "chef de cuisine"],
+    "Ressources humaines": ["rh", "assistant rh", "gestionnaire rh", "charge de recrutement"],
+    "Commerce & Distribution": ["commercial", "vente", "prospection", "client", "clientele", "vendeur", "responsable magasin"],
+    "Conseil & Audit": ["conseiller", "chef de projet", "charge d etudes", "analyste"],
+}
+
+
+def _stem(tok: str) -> str:
+    """Racine très simple : ignore pluriel et féminin (infirmière = infirmier, comptables = comptable)."""
+    if tok.endswith("euses"):
+        tok = tok[:-5] + "eur"
+    elif tok.endswith("euse"):
+        tok = tok[:-4] + "eur"
+    if len(tok) > 3 and tok.endswith(("s", "x")):
+        tok = tok[:-1]
+    if len(tok) > 4 and tok.endswith("e"):
+        tok = tok[:-1]
+    return tok
+
+
+def _tokens(text: str) -> list:
+    return [_stem(w) for w in re.findall(r"[a-z0-9]+", norm(text))]
+
+
+def _contains(tokens: list, kw: list) -> bool:
+    n = len(kw)
+    return n > 0 and any(tokens[i:i + n] == kw for i in range(len(tokens) - n + 1))
+
+
+# mots-clés pré-calculés une seule fois : (secteur, racines, poids, précis ?)
+_COMPILED = []
+for _sector, _kws in SECTORS:
+    for _k in _kws:
+        _stems = _tokens(_k)
+        _COMPILED.append((_sector, _stems, 1.0 + (len(_stems) - 1), True))
+for _sector, _kws in EXTRA_KEYWORDS.items():
+    for _k in _kws:
+        _stems = _tokens(_k)
+        _COMPILED.append((_sector, _stems, 0.5 if len(_stems) == 1 else 1.0, False))
+
+
 def classify(text: str) -> str:
-    """Classe le texte selon les mots-clés spécifiques de chaque secteur."""
+    """Classe le texte par secteur. Tolère pluriel/féminin ; les mots-clés précis l'emportent sur les génériques ;
+    en cas d'égalité, le secteur qui a le plus de mots-clés trouvés gagne, puis l'ordre de la liste SECTORS.
+    Retourne « Non classé » seulement si aucun mot-clé n'est trouvé."""
     t = norm(text)
-
-    # Exceptions pour les entreprises vérifiées
-    if "safe labs" in t:
+    if "safe labs" in t:                      # exception : entreprise vérifiée
         return "Informatique & IA"
-
-    scores = {}
-
-    for sector, keywords in SECTORS:
-        score = 0
-
-        for keyword in keywords:
-            k = norm(keyword)
-            pattern = r"(?<!\w)" + re.escape(k) + r"(?!\w)"
-
-            if re.search(pattern, t):
-                score += 1 + k.count(" ")
-
-        scores[sector] = score
-
-    if not scores:
+    toks = _tokens(text)
+    score, hits, precise = {}, {}, {}
+    for sector, kw, weight, is_precise in _COMPILED:
+        if _contains(toks, kw):
+            score[sector] = score.get(sector, 0) + weight
+            hits[sector] = hits.get(sector, 0) + 1
+            precise[sector] = precise.get(sector, 0) + (1 if is_precise else 0)
+    if not score:
         return "Non classé"
-
-    best_sector = max(scores, key=scores.get)
-    best_score = scores[best_sector]
-
-    if best_score == 0:
-        return "Non classé"
-
-    winners = [
-        sector for sector, score in scores.items()
-        if score == best_score
-    ]
-
-    if len(winners) > 1:
-        return "Non classé"
-
-    return best_sector
+    order = {name: i for i, (name, _) in enumerate(SECTORS)}
+    return max(score, key=lambda s: (score[s], precise[s], hits[s], -order[s]))
 
 
 
