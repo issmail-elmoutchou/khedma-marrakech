@@ -75,9 +75,11 @@
     const l = langLines(cv.languages); if (!l.length) return '';
     return mode === 'list' ? bullets(l) : `<p>${l.map(esc).join(' &nbsp;|&nbsp; ')}</p>`;
   }
-  const expHtml = () => cv.experiences.map(x => `<div class="it"><b>${esc(x.role)}${x.company ? ' - ' + esc(x.company) : ''}</b> <small>${x.period ? '(' + esc(x.period) + ')' : ''}</small>${bullets(splitItems(x.details))}</div>`).join('');
-  const prjHtml = () => cv.projects.map(x => `<div class="it"><b>${esc(x.name)}</b> <small>${esc(x.link)}</small>${bullets(splitItems(x.description))}</div>`).join('');
-  const eduHtml = () => cv.education.map(x => `<div class="it"><b>${esc(x.degree)}${x.school ? ' - ' + esc(x.school) : ''}</b> <small>${x.period ? '(' + esc(x.period) + ')' : ''}</small></div>`).join('');
+  const row = (b, sub, period) => `<div class="row"><div><b>${b}</b>${sub ? `<span class="sub">${sub}</span>` : ''}</div><small>${period ? esc(period) : ''}</small></div>`;
+  const expHtml = () => cv.experiences.map(x => `<div class="it">${row(esc(x.role), esc(x.company), x.period)}${bullets(splitItems(x.details))}</div>`).join('');
+  const prjHtml = () => cv.projects.map(x => `<div class="it">${row(esc(x.name), esc(x.link), '')}${bullets(splitItems(x.description))}</div>`).join('');
+  const eduHtml = () => cv.education.map(x => `<div class="it">${row(esc(x.degree), esc(x.school), x.period)}</div>`).join('');
+  const langsSide = () => parseGroups(cv.languages).flatMap(g => g.items.map(splitLang)).map(([n, l]) => `<div class="lg"><b>${esc(n)}</b>${l ? `<span>${esc(l)}</span>` : ''}</div>`).join('');
   const profile = () => cv.summary ? `<p>${esc(cv.summary).replace(/\n/g, '<br>')}</p>` : '';
 
   function render() {
@@ -85,8 +87,11 @@
     const head = `<header class="cvp-head"><h3>${esc(cv.full_name) || 'Votre nom'}</h3>${cv.title ? `<div class="t">${esc(cv.title)}</div>` : ''}<div class="m">${meta}</div></header>`;
     const box = $('#cv-preview'); box.className = 'cvp ' + cv.style;
     if (cv.style === 'modern') {
-      box.innerHTML = head + `<div class="cvp-body"><aside>${sec('Compétences', skillsHtml('list'))}${sec('Langues', langsHtml('list'))}</aside>` +
-        `<div class="cvp-main">${sec('Profil', profile())}${sec('Expérience professionnelle', expHtml())}${sec('Projets', prjHtml())}${sec('Formation', eduHtml())}</div></div>`;
+      const initials = (cv.full_name || '').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'CV';
+      const contact = [['Email', cv.email], ['Téléphone', cv.phone], ['Ville', cv.city], ['Liens', cv.links]].filter(r => r[1]).map(r => `<div class="ct"><small>${r[0]}</small>${esc(r[1])}</div>`).join('');
+      box.innerHTML = `<div class="cvp-body"><aside><div class="av">${esc(initials)}</div>${sec('Contact', contact)}${sec('Compétences', skillsHtml('list'))}${sec('Langues', langsSide())}</aside>` +
+        `<div class="cvp-main"><header class="cvp-head"><h3>${esc(cv.full_name) || 'Votre nom'}</h3>${cv.title ? `<div class="t">${esc(cv.title)}</div>` : ''}</header>` +
+        `${sec('Profil', profile())}${sec('Expérience professionnelle', expHtml())}${sec('Projets', prjHtml())}${sec('Formation', eduHtml())}</div></div>`;
     } else {
       box.innerHTML = head + sec('Profil', profile()) + sec('Formation', eduHtml()) + sec('Expérience professionnelle', expHtml()) +
         sec('Projets', prjHtml()) + sec('Compétences', skillsHtml('inline')) + sec('Langues', langsHtml('inline'));
@@ -97,5 +102,5 @@
   const msg = (t, k) => { const m = $('#cv-msg'); m.textContent = t; m.className = 'msg ' + k; };
   const save = async () => { const r = await post('/api/cv', cv); msg(r.ok ? 'CV enregistré.' : 'Enregistrement impossible.', r.ok ? 'ok' : 'error'); return r.ok; };
   $('#cv-save').onclick = save;
-  $('#cv-pdf').addEventListener('click', async e => { e.preventDefault(); if (await save()) location.href = e.currentTarget.href; });
+  $('#cv-pdf').addEventListener('click', async e => { e.preventDefault(); const link = e.currentTarget; if (await save()) location.href = link.href; });   // currentTarget devient null après un await : on le garde avant
 })();

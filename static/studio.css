@@ -65,3 +65,31 @@
 .logo.has-img{background:#fff;padding:5px}
 .logo.big.has-img{width:84px;height:84px;padding:8px;border-radius:18px}
 @media (prefers-color-scheme: dark){ a{color:var(--saffron)} }
+
+/* ---- Studio CV : aperçu en direct (même mise en page que le PDF) ---- */
+.cvp{--acc:#1B2A49;--gold:#D9902B;background:#fff;color:#2B2B2B;border:1px solid var(--line);border-radius:6px;font-size:.78rem;line-height:1.5;box-shadow:0 6px 24px rgba(0,0,0,.08);overflow:hidden;min-height:520px}
+.cvp h3{margin:0;font-size:1.65rem;line-height:1.15;color:var(--acc);font-weight:800}
+.cvp .t{font-size:.95rem;color:#B3711A;margin-top:2px}
+.cvp .m{font-size:.72rem;color:#777;margin-top:3px}
+.cvp h4{margin:14px 0 8px;font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;color:var(--acc);position:relative;padding-bottom:6px}
+.cvp h4::after{content:"";position:absolute;left:0;bottom:0;width:26px;height:2px;background:var(--gold)}
+.cvp p{margin:3px 0}.cvp ul{margin:3px 0 0;padding-left:15px}.cvp li{margin:1px 0}.cvp li::marker{color:var(--gold)}
+.cvp .it{margin-top:8px}.cvp .row{display:flex;justify-content:space-between;gap:10px}
+.cvp .row b{display:block}.cvp .row .sub{display:block;color:#B3711A;font-size:.74rem}.cvp .row small{color:#777;white-space:nowrap}
+.cvp .gt{font-weight:700;margin-top:6px;font-size:.74rem;color:#333}
+.cvp.modern .cvp-body{display:grid;grid-template-columns:36% 1fr;min-height:520px}
+.cvp.modern aside{background:var(--acc);color:#fff;padding:22px 16px}
+.cvp.modern aside .av{width:74px;height:74px;border-radius:50%;background:var(--gold);color:var(--acc);display:grid;place-items:center;font-size:1.5rem;font-weight:800;margin:0 auto 6px}
+.cvp.modern aside h4{color:#fff}.cvp.modern aside .gt{color:#E8C98F}
+.cvp.modern aside .ct{margin-top:6px;word-break:break-word}.cvp.modern aside .ct small{display:block;color:#AEB8D0;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase}
+.cvp.modern aside .lg{margin-top:5px}.cvp.modern aside .lg b{display:block}.cvp.modern aside .lg span{display:block;font-size:.7rem;color:#C9D1E3}
+.cvp.modern .cvp-main{padding:26px 22px 22px}
+.cvp.classic{padding:26px 28px}
+.cvp.classic .cvp-head{text-align:center;padding-bottom:10px;border-bottom:3px double var(--acc)}
+.cvp.classic h4{border-bottom:1px solid #d5d5d5}.cvp.classic h4::after{display:none}
+/* choix du modèle (boutons radio) */
+.cv-form .seg{display:flex;gap:6px;margin:0;width:100%}
+.cv-form .seg-opt{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:10px 14px;border-radius:9px;cursor:pointer;font-weight:700;font-size:.88rem;color:var(--ink);text-align:center}
+.cv-form .seg-opt input{width:auto;padding:0;margin:0;accent-color:var(--wine)}
+.cv-form .seg-opt:has(input:checked){background:var(--wine);color:#fff}
+.cv-form .seg-opt:has(input:checked) input{accent-color:#fff}
